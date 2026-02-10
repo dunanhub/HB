@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Поздравление 🎉</title>
+  <style>
+    :root {
+      --bg-dark: #070a12;
+      --bg-blue: #0b1030;
+      --glass: rgba(255, 255, 255, 0.1);
+      --text-color: rgba(255, 255, 255, 0.9);
+      --paper-color: #f6f1e7;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255, 79, 216, 0.15), transparent 50%),
+        radial-gradient(circle at 85% 20%, rgba(106, 228, 255, 0.15), transparent 50%),
+        linear-gradient(160deg, var(--bg-dark), var(--bg-blue));
+      height: 100vh;
+      overflow: hidden; /* оставляем: скроллим внутри листа */
+      font-family: system-ui, -apple-system, sans-serif;
+      color: var(--text-color);
+    }
+
+    /* --- Стартовый экран --- */
+    .start-screen {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      transition: opacity 0.5s, visibility 0.5s;
+    }
+
+    .start-card {
+      background: var(--glass);
+      padding: 30px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.2);
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      max-width: 300px;
+      cursor: pointer;
+      animation: pulse-border 2s infinite;
+      user-select: none;
+    }
+
+    .start-card h2 { margin: 0 0 10px; font-size: 24px; }
+    .start-card p { margin: 0 0 20px; font-size: 14px; opacity: 0.7; }
+    .btn {
+      background: rgba(255,255,255,0.2);
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-weight: bold;
+      display: inline-block;
+    }
+
+    .start-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    @keyframes pulse-border {
+      0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2); }
+      70% { box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+    }
+
+    /* --- Сцена --- */
+    .scene {
+      position: fixed;
+      inset: 0;
+      pointer-events: none; /* сцена не ловит жесты */
+    }
+
+    /* --- РУКА (ЗАДНИЙ СЛОЙ) --- */
+    .arm-wrapper {
+      position: absolute;
+      left: 50%;
+      top: -120vh;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 120vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      z-index: 20;
+      transition: top 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .sleeve {
+      width: 80px;
+      height: 100%;
+      background: linear-gradient(90deg, #1e253a, #2c3550);
+      border-left: 2px solid rgba(255,255,255,0.1);
+      border-right: 2px solid rgba(255,255,255,0.1);
+    }
+
+    .hand-svg {
+      width: 140px;
+      margin-top: -10px;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+    }
+
+    /* --- ПИСЬМО --- */
+    .paper-container {
+      position: absolute;
+      left: 50%;
+      bottom: -110%;
+      transform: translate(-50%, 0);
+      width: 90%;
+      max-width: 380px;
+      z-index: 15;
+      transition: bottom 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+      pointer-events: auto; /* ✅ ВАЖНО: теперь лист ловит скролл/тач */
+    }
+
+    .paper {
+      background: var(--paper-color);
+      color: #1a1820;
+      padding: 18px;
+      border-radius: 15px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      transform: rotate(-2deg);
+      text-align: center;
+      position: relative;
+    }
+
+    .paper::before {
+      content: '';
+      position: absolute;
+      inset: 5px;
+      border: 2px dashed rgba(0,0,0,0.1);
+      border-radius: 10px;
+      pointer-events: none;
+    }
+
+    .paper h1 {
+      font-family: 'Georgia', serif;
+      color: #d35400;
+      margin: 10px 0 12px;
+      font-size: 28px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ✅ СКРОЛЛ-ОБЛАСТЬ */
+    .paper-scroll{
+      position: relative;
+      z-index: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 8px 8px;
+      text-align: left;
+
+      /* высота под телефон: чтобы влезало на экран */
+      max-height: min(52vh, 420px);
+
+      /* красивее прокрутка и чтобы палец не тянул страницу */
+      overscroll-behavior: contain;
+    }
+
+    .paper-scroll p {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.6;
+      white-space: pre-wrap; /* ✅ если вставишь много строк — сохранит переносы */
+    }
+
+    .date {
+      position: relative;
+      z-index: 1;
+      font-size: 12px;
+      color: rgba(0,0,0,0.5);
+      margin-top: 12px;
+      border-top: 1px solid rgba(0,0,0,0.1);
+      padding-top: 10px;
+    }
+
+    /* --- БОЛЬШОЙ ПАЛЕЦ --- */
+    .thumb-wrapper{
+      position: absolute;
+      left: 38%;
+      top: -32vh;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 120vh;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      z-index: 30;
+      transition: top 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+      pointer-events:none;
+    }
+
+    .thumb-overlay {
+      width: 64px;
+      height: 64px;
+      background: #f5cba7;
+      border-radius: 32px;
+      opacity: 0;
+      box-shadow: -2px 5px 10px rgba(0,0,0,0.25);
+      transition: opacity 0.2s;
+      margin-bottom: 20px;
+    }
+    .thumb-overlay.visible { opacity: 1; }
+
+    /* --- Классы анимации --- */
+    .arm-wrapper.go-down { top: 0; }
+    .arm-wrapper.go-up   { top: -85vh; }
+
+    .thumb-wrapper.go-down { top: 0; }
+
+    .paper-container.lifted { bottom: -9vh; }
+
+    /* (необязательно) тонкая полоска скролла в Chrome/Android */
+    .paper-scroll::-webkit-scrollbar { width: 6px; }
+    .paper-scroll::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,.18);
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="start-screen" id="startScreen">
+    <div class="start-card">
+      <h2>Нажми на меня ✨</h2>
+      <p>У меня есть послание для тебя...</p>
+      <div class="btn">Открыть</div>
+    </div>
+  </div>
+
+  <div class="scene">
+
+    <div class="arm-wrapper" id="arm">
+      <div class="sleeve"></div>
+      <svg class="hand-svg" viewBox="0 0 140 160" aria-hidden="true">
+        <path d="M20,0 L120,0 L120,100 Q120,130 90,140 L50,140 Q20,130 20,100 Z" fill="#f5cba7"/>
+        <path d="M40,140 L40,80" stroke="#e6b996" stroke-width="4" stroke-linecap="round"/>
+        <path d="M70,140 L70,75" stroke="#e6b996" stroke-width="4" stroke-linecap="round"/>
+        <path d="M100,140 L100,80" stroke="#e6b996" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="paper-container" id="paper">
+      <div class="paper">
+        <h1>С Днём Рождения! 🎂</h1>
+
+        <!-- ✅ Внутри этого блока будет скролл -->
+        <div class="paper-scroll">
+          <p>
+            Пусть твоя жизнь будет как любимый плейлист: без лишних треков, но с теми, что сразу в сердце. Пусть мечты не «когда-нибудь», а «давай сейчас», люди — тёплые, решения — смелые, а ты — всегда собой: живой, смешной, умной и настоящей.
+
+            Желаю тебе дней, после которых хочется писать «это было круто», ночей с разговорами до смеха и планов, которые внезапно сбываются. И пусть мир иногда офигевает от тебя — ты всё делаешь правильно.
+
+            С Днём Рождения! 🎂
+            p/s: Беконти)
+          </p>
+        </div>
+
+        <div class="date" id="currentDate"></div>
+      </div>
+    </div>
+
+    <div class="thumb-wrapper" id="thumbWrap" aria-hidden="true">
+      <div class="thumb-overlay" id="thumb"></div>
+    </div>
+
+  </div>
+
+  <script>
+    document.getElementById('currentDate').innerText = new Date().toLocaleDateString();
+
+    const startScreen = document.getElementById('startScreen');
+    const arm = document.getElementById('arm');
+    const paper = document.getElementById('paper');
+    const thumbWrap = document.getElementById('thumbWrap');
+
+    let isAnimating = false;
+
+    startScreen.addEventListener('click', () => {
+      if (isAnimating) return;
+      isAnimating = true;
+
+      startScreen.classList.add('hidden');
+
+      setTimeout(() => {
+        arm.classList.add('go-down');
+        thumbWrap.classList.add('go-down');
+      }, 80);
+
+      setTimeout(() => {
+        arm.classList.remove('go-down');
+        arm.classList.add('go-up');
+
+        thumbWrap.classList.remove('go-down');
+
+        paper.classList.add('lifted');
+      }, 1600);
+    });
+  </script>
+</body>
+</html>
